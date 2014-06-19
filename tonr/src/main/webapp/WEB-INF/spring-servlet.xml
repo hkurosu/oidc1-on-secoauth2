@@ -11,8 +11,23 @@
 		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
 		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd">
 
+	<mvc:default-servlet-handler />
+
+	<mvc:annotation-driven>
+		<mvc:message-converters>
+			<bean
+				class="org.springframework.http.converter.BufferedImageHttpMessageConverter" />
+		</mvc:message-converters>
+	</mvc:annotation-driven>
+
 	<context:property-placeholder
 		location="classpath:/keyhole.properties,classpath:/sparklr.properties" />
+
+	<import resource="classpath:/spring/oidc-client-filter.xml" />
+	
+	<!--define an oauth 2 resource for sparklr -->
+	<import resource="classpath:/spring/oauth2-resources.xml" />
+
 
 	<http access-denied-page="/login.jsp?authorization_error=true"
 		xmlns="http://www.springframework.org/schema/security"
@@ -36,17 +51,9 @@
 	<bean id="tokenStore"
 		class="org.springframework.security.oauth2.provider.token.store.InMemoryTokenStore" />
 		
-	<bean id="clientTokenServices" class="org.springframework.security.oauth2.sso.provider.token.LocalClientTokenServices">
-		<property name="tokenStore" ref="tokenStore"/>
-	</bean>
-
-	<import resource="classpath:/spring/oauth2-sso-filter.xml" />
 	
 	<!--apply the oauth client context -->
 	<oauth:client id="oauth2ClientFilter" />
-
-	<!--define an oauth 2 resource for sparklr -->
-	<import resource="classpath:/spring/oauth2-resources.xml" />
 
 	<bean id="conversionService"
 		class="org.springframework.context.support.ConversionServiceFactoryBean">
@@ -57,15 +64,6 @@
 			</set>
 		</property>
 	</bean>
-
-	<mvc:default-servlet-handler />
-
-	<mvc:annotation-driven>
-		<mvc:message-converters>
-			<bean
-				class="org.springframework.http.converter.BufferedImageHttpMessageConverter" />
-		</mvc:message-converters>
-	</mvc:annotation-driven>
 
 	<bean id="contentViewResolver"
 		class="org.springframework.web.servlet.view.ContentNegotiatingViewResolver">

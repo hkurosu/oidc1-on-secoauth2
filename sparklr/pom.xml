@@ -3,8 +3,8 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
-  		<groupId>oauth2-sso-samples</groupId>
-  		<artifactId>oauth2-sso-samples-parent</artifactId>
+  		<groupId>oidc1-on-secoauth2</groupId>
+  		<artifactId>oidc1-on-secoauth2-parent</artifactId>
   		<version>0.0.1-SNAPSHOT</version>
 		<relativePath>..</relativePath>
 	</parent>
@@ -107,7 +107,7 @@
 	<dependencies>
 		<dependency>
 			<groupId>${pom.groupId}</groupId>
-			<artifactId>oauth2sso</artifactId>
+			<artifactId>oidc-client</artifactId>
 			<version>${pom.version}</version>
 		</dependency>
 	

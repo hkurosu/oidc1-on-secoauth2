@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:oauth="http://www.springframework.org/schema/security/oauth2"
+	xmlns:sec="http://www.springframework.org/schema/security"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:c="http://www.springframework.org/schema/c"
+	xsi:schemaLocation="http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security.xsd
+		http://www.springframework.org/schema/security/oauth2 http://www.springframework.org/schema/security/spring-security-oauth2-2.0.xsd
+		http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-3.1.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd">
+
+	<bean id="clientDetailsUserService"
+		class="org.springframework.security.oauth2.provider.client.ClientDetailsUserDetailsService">
+		<constructor-arg ref="clientDetails" />
+	</bean>
+
+	<bean id="tokenStore"
+		class="org.springframework.security.oauth2.provider.token.store.InMemoryTokenStore" />
+
+	<bean id="tokenServices"
+		class="org.springframework.security.oauth2.provider.token.DefaultTokenServices">
+		<property name="tokenStore" ref="tokenStore" />
+		<property name="tokenEnhancer" ref="tokenEnhancer" />
+		<property name="supportRefreshToken" value="true" />
+		<property name="clientDetailsService" ref="clientDetails" />
+	</bean>
+
+	<bean id="tokenEnhancer" class="com.example.oidc.token.OIDCIdTokenEnhancer"
+		p:issuer="${authServerUri}"
+	/>
+
+	<bean id="requestFactory"
+		class="org.springframework.security.oauth2.provider.request.DefaultOAuth2RequestFactory">
+		<constructor-arg name="clientDetailsService" ref="clientDetails" />
+	</bean>
+
+	<bean id="userApprovalHandler"
+		class="org.springframework.security.oauth.examples.keyhole.oauth.SparklrUserApprovalHandler">
+		<property name="approvalStore" ref="approvalStore" />
+		<property name="clientDetailsService" ref="clientDetails" />
+		<property name="requestFactory" ref="requestFactory" />
+	</bean>
+
+	<bean id="approvalStore"
+		class="org.springframework.security.oauth2.provider.approval.TokenApprovalStore">
+		<property name="tokenStore" ref="tokenStore" />
+	</bean>
+
+	<!-- authorization server definition -->
+	<oauth:authorization-server
+		client-details-service-ref="clientDetails" token-services-ref="tokenServices"
+		user-approval-handler-ref="userApprovalHandler">
+		<oauth:authorization-code />
+		<oauth:implicit />
+		<oauth:refresh-token />
+		<oauth:client-credentials />
+		<oauth:password />
+	</oauth:authorization-server>
+
+</beans>

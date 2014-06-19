@@ -1,13 +1,15 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <groupId>oauth2-sso-samples</groupId>
-  <artifactId>oauth2-sso-samples-parent</artifactId>
+  <groupId>oidc1-on-secoauth2</groupId>
+  <artifactId>oidc1-on-secoauth2-parent</artifactId>
   <version>0.0.1-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>OAuth2 SSO Samples</name>
   <modules>
   	<module>keyhole</module>
-  	<module>oauth2sso</module>
+  	<module>oidc-common</module>
+  	<module>oidc-client</module>
+  	<module>oidc-server</module>
   	<module>sparklr</module>
   	<module>tonr</module>
   </modules>
@@ -21,8 +23,8 @@
     <java.version>1.6</java.version>
   </properties>  
   <scm>
-  	<url>https://github.com/hkurosu/oauth2-sso-samples</url>
-  	<connection>https://github.com/hkurosu/oauth2-sso-samples.git</connection>
+  	<url>https://github.com/hkurosu/oidc1-on-secoauth2</url>
+  	<connection>https://github.com/hkurosu/oidc1-on-secoauth2.git</connection>
   	<developerConnection>hkurosu@gmail.com</developerConnection>
   	<tag>HEAD</tag>
   </scm>

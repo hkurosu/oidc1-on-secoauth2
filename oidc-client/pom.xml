@@ -9,9 +9,9 @@
 		<relativePath>..</relativePath>
 	</parent>
 
-	<artifactId>keyhole2</artifactId>
-	<packaging>war</packaging>
-	<name>OAuth for Spring Security - Keyhole (OAuth 2 Auth Server Example)</name>
+	<artifactId>oidc-client</artifactId>
+	<packaging>jar</packaging>
+	<name>OIDC (OpenID Connect) on Spring Security OAUTH2</name>
 
 	<profiles>
 		<profile>
@@ -69,17 +69,6 @@
 				</configuration>
 			</plugin>
 		</plugins>
-		<pluginManagement>
-			<plugins>
-				<plugin>
-					<groupId>org.codehaus.mojo</groupId>
-					<artifactId>tomcat-maven-plugin</artifactId>
-					<configuration>
-						<addContextWarDependencies>true</addContextWarDependencies>
-					</configuration>
-				</plugin>
-			</plugins>
-		</pluginManagement>
 	</build>
 
 	<repositories>
@@ -100,16 +89,25 @@
 	</repositories>
 
 	<dependencies>
+	
 		<dependency>
 			<groupId>${pom.groupId}</groupId>
-			<artifactId>oidc-server</artifactId>
+			<artifactId>oidc-common</artifactId>
 			<version>${pom.version}</version>
-		</dependency>	
-<!-- 		<dependency>
+		</dependency>
+		
+		<dependency>
 			<groupId>org.springframework.security.oauth</groupId>
 			<artifactId>spring-security-oauth2</artifactId>
 			<version>${spring.oauth.version}</version>
-		</dependency> -->
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-jwt</artifactId>
+			<version>1.0.2.RELEASE</version>
+		</dependency>
+		
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-web</artifactId>
@@ -136,45 +134,14 @@
 
 		<dependency>
 			<groupId>org.springframework</groupId>
-			<artifactId>spring-jdbc</artifactId>
-			<version>${spring.version}</version>
-		</dependency>
-
-		<dependency>
-			<groupId>org.springframework</groupId>
 			<artifactId>spring-webmvc</artifactId>
 			<version>${spring.version}</version>
-		</dependency>
-
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-test</artifactId>
-			<version>${spring.version}</version>
-			<scope>test</scope>
-		</dependency>
-
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-tx</artifactId>
-			<version>${spring.version}</version>
-		</dependency>
-
-		<dependency>
-			<groupId>org.springframework.security</groupId>
-			<artifactId>spring-security-taglibs</artifactId>
-			<version>${spring.security.version}</version>
 		</dependency>
 
 		<dependency>
 			<groupId>org.codehaus.jackson</groupId>
 			<artifactId>jackson-mapper-asl</artifactId>
 			<version>1.8.3</version>
-		</dependency>
-
-		<dependency>
-			<groupId>cglib</groupId>
-			<artifactId>cglib</artifactId>
-			<version>2.2.2</version>
 		</dependency>
 
 		<dependency>
@@ -185,25 +152,7 @@
 			<scope>provided</scope>
 		</dependency>
 
-		<dependency>
-			<groupId>javax.servlet</groupId>
-			<artifactId>jstl</artifactId>
-			<version>1.2</version>
-		</dependency>
 
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<version>4.8.2</version>
-			<scope>test</scope>
-		</dependency>
-
-		<dependency>
-			<groupId>org.apache.httpcomponents</groupId>
-			<artifactId>httpclient</artifactId>
-			<version>4.3.1</version>
-			<scope>test</scope>
-		</dependency>
 
 	</dependencies>
 

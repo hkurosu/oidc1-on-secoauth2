@@ -9,37 +9,23 @@
 		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
 		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd">
 
-	<context:property-placeholder location="classpath:/keyhole.properties" />
-	
-	<!-- Just for testing... -->
-	<http pattern="/oauth/cache_approvals" security="none"
-		xmlns="http://www.springframework.org/schema/security" />
-	<http pattern="/oauth/uncache_approvals" security="none"
-		xmlns="http://www.springframework.org/schema/security" />
+	<mvc:annotation-driven />
+	<mvc:default-servlet-handler />
 
-	<http pattern="/oauth/token" create-session="stateless"
-		authentication-manager-ref="clientAuthenticationManager"
-		xmlns="http://www.springframework.org/schema/security">
-		<intercept-url pattern="/**" method="GET" access="ROLE_DENY" />
-		<intercept-url pattern="/**" method="PUT" access="ROLE_DENY" />
-		<intercept-url pattern="/**" method="DELETE" access="ROLE_DENY" />
-		<intercept-url pattern="/**" access="IS_AUTHENTICATED_FULLY" />
-		<anonymous enabled="false" />
-		<http-basic entry-point-ref="clientAuthenticationEntryPoint" />
-		<access-denied-handler ref="oauthAccessDeniedHandler" />
-	</http>
-	
-	<http pattern="/oauth/check_token" create-session="stateless"
-		authentication-manager-ref="clientAuthenticationManager"
-		xmlns="http://www.springframework.org/schema/security">
-		<intercept-url pattern="/**" method="GET" access="ROLE_DENY" />
-		<intercept-url pattern="/**" method="PUT" access="ROLE_DENY" />
-		<intercept-url pattern="/**" method="DELETE" access="ROLE_DENY" />
-		<intercept-url pattern="/**" access="IS_AUTHENTICATED_FULLY" />
-		<anonymous enabled="false" />
-		<http-basic entry-point-ref="clientAuthenticationEntryPoint" />
-		<access-denied-handler ref="oauthAccessDeniedHandler" />
-	</http>
+	<sec:global-method-security
+		pre-post-annotations="enabled" proxy-target-class="true">
+		<!--you could also wire in the expression handler up at the layer of the 
+			http filters. See https://jira.springsource.org/browse/SEC-1452 -->
+		<sec:expression-handler ref="oauthExpressionHandler" />
+	</sec:global-method-security>
+
+	<import resource="classpath:spring/spring-views.xml"/>
+
+
+	<!-- client details definitions -->
+	<import resource="classpath:/spring/oauth2-clients.xml"/>
+	<import resource="classpath:/spring/oidc-authserver.xml"/>
+	<import resource="classpath:/spring/oidc-endpoints.xml"/>
 
 	<!-- The OAuth2 protected resources are separated out into their own block 
 		so we can deal with authorization and error handling separately. This isn't 
@@ -66,19 +52,6 @@
 		<expression-handler ref="oauthWebExpressionHandler" />
 	</http>
 
-	<!-- The OAuth2 protected resources are separated out into their own block 
-		so we can deal with authorization and error handling separately. This isn't 
-		mandatory, but it makes it easier to control the behaviour. -->
-	<http pattern="/me/**" create-session="never"
-		entry-point-ref="oauthAuthenticationEntryPoint"
-		access-decision-manager-ref="accessDecisionManager"
-		xmlns="http://www.springframework.org/schema/security">
-		<anonymous enabled="false" />
-		<intercept-url pattern="/me" access="ROLE_USER,SCOPE_READ" />
-		<custom-filter ref="resourceServerFilter" before="PRE_AUTH_FILTER" />
-		<access-denied-handler ref="oauthAccessDeniedHandler" />
-	</http>
-
 	<http access-denied-page="/login.jsp?authorization_error=true"
 		disable-url-rewriting="true" xmlns="http://www.springframework.org/schema/security">
 		<intercept-url pattern="/oauth/**" access="ROLE_USER" />
@@ -91,6 +64,9 @@
 			invalidate-session="true" />
 		<anonymous />
 	</http>
+
+	<oauth:expression-handler id="oauthExpressionHandler" />
+	<oauth:web-expression-handler id="oauthWebExpressionHandler" />
 	
 	<bean id="globalLogoutSeccessHandler" class="org.springframework.security.web.authentication.logout.SimpleUrlLogoutSuccessHandler">
 		<property name="targetUrlParameter" value="redir" />
@@ -141,97 +117,10 @@
 		</authentication-provider>
 	</authentication-manager>
 
-	<bean id="clientDetailsUserService"
-		class="org.springframework.security.oauth2.provider.client.ClientDetailsUserDetailsService">
-		<constructor-arg ref="clientDetails" />
-	</bean>
-
-	<bean id="tokenStore"
-		class="org.springframework.security.oauth2.provider.token.store.InMemoryTokenStore" />
-
-	<bean id="tokenServices"
-		class="org.springframework.security.oauth2.provider.token.DefaultTokenServices">
-		<property name="tokenStore" ref="tokenStore" />
-		<property name="tokenEnhancer" ref="tokenEnhancer" />
-		<property name="supportRefreshToken" value="true" />
-		<property name="clientDetailsService" ref="clientDetails" />
-	</bean>
-
-	<bean id="tokenEnhancer"
-		class="org.springframework.security.oauth.examples.keyhole.oauth.SparklrTokenEnhancer" />
-
-	<bean id="requestFactory"
-		class="org.springframework.security.oauth2.provider.request.DefaultOAuth2RequestFactory">
-		<constructor-arg name="clientDetailsService" ref="clientDetails" />
-	</bean>
-
-	<bean id="userApprovalHandler"
-		class="org.springframework.security.oauth.examples.keyhole.oauth.SparklrUserApprovalHandler">
-		<property name="approvalStore" ref="approvalStore" />
-		<property name="clientDetailsService" ref="clientDetails" />
-		<property name="requestFactory" ref="requestFactory" />
-	</bean>
-
-	<bean id="approvalStore"
-		class="org.springframework.security.oauth2.provider.approval.TokenApprovalStore">
-		<property name="tokenStore" ref="tokenStore" />
-	</bean>
-
-	<!-- authorization server definition -->
-	<oauth:authorization-server
-		client-details-service-ref="clientDetails" token-services-ref="tokenServices"
-		user-approval-handler-ref="userApprovalHandler">
-		<oauth:authorization-code />
-		<oauth:implicit />
-		<oauth:refresh-token />
-		<oauth:client-credentials />
-		<oauth:password />
-	</oauth:authorization-server>
-
 	<!-- resource server filter definition for auth server resource access -->
 	<oauth:resource-server id="resourceServerFilter"
 		resource-id="sparklr" token-services-ref="tokenServices" />
 		
-	<!-- client details definitions -->
-	<import resource="classpath:/spring/oauth2-clients.xml"/>
-	<mvc:annotation-driven />
-
-	<mvc:default-servlet-handler />
-
-	<sec:global-method-security
-		pre-post-annotations="enabled" proxy-target-class="true">
-		<!--you could also wire in the expression handler up at the layer of the 
-			http filters. See https://jira.springsource.org/browse/SEC-1452 -->
-		<sec:expression-handler ref="oauthExpressionHandler" />
-	</sec:global-method-security>
-
-	<oauth:expression-handler id="oauthExpressionHandler" />
-
-	<oauth:web-expression-handler id="oauthWebExpressionHandler" />
-
-	<!--Basic application beans. -->
-	<bean id="viewResolver"
-		class="org.springframework.web.servlet.view.ContentNegotiatingViewResolver">
-		<property name="mediaTypes">
-			<map>
-				<entry key="json" value="application/json" />
-			</map>
-		</property>
-		<property name="viewResolvers">
-			<bean
-				class="org.springframework.web.servlet.view.InternalResourceViewResolver">
-				<property name="prefix" value="/WEB-INF/jsp/"></property>
-				<property name="suffix" value=".jsp"></property>
-			</bean>
-		</property>
-		<property name="defaultViews">
-			<bean
-				class="org.springframework.web.servlet.view.json.MappingJacksonJsonView">
-				<property name="extractValueFromSingleKeyModel" value="true" />
-			</bean>
-		</property>
-	</bean>
-
 	<bean id="adminController"
 		class="org.springframework.security.oauth.examples.keyhole.mvc.AdminController">
 		<property name="tokenServices" ref="tokenServices" />
@@ -244,11 +133,6 @@
 		class="org.springframework.security.oauth.examples.keyhole.mvc.AccessConfirmationController">
 		<property name="clientDetailsService" ref="clientDetails" />
 		<property name="approvalStore" ref="approvalStore" />
-	</bean>
-	
-	<!-- /check_token framework endpoint -->
-	<bean id="checkTokenEndpoint" class="org.springframework.security.oauth2.provider.endpoint.CheckTokenEndpoint">
-		<constructor-arg ref="tokenServices"/>
 	</bean>
 	
 </beans>

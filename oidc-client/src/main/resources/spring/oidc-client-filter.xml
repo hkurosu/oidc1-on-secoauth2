@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xmlns:sec="http://www.springframework.org/schema/security"
+	xmlns:oauth="http://www.springframework.org/schema/security/oauth2"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xmlns:c="http://www.springframework.org/schema/c"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xsi:schemaLocation="http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security.xsd
+		http://www.springframework.org/schema/security/oauth2 http://www.springframework.org/schema/security/spring-security-oauth2-1.0.xsd
+		http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-3.1.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.1.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.2.xsd">
+
+	<!--apply the oauth client context -->
+	<oauth:client id="oauth2ClientFilter" />
+	
+	<bean id="oidcSignOnFilter"	class="com.example.oidc.auth.OIDCAuthenticationFilter"
+		c:defaultFilterProcessesUrl="${loginFormUri}"		
+		p:tokenServices-ref="oauth2RemoteTokenServices"
+		p:restTemplate-ref="oauth2RestTemplate" />
+
+	<bean id="oauth2RemoteTokenServices" class="org.springframework.security.oauth2.provider.token.RemoteTokenServices"
+		p:clientId="tonr"
+		p:clientSecret="secret" 
+		p:checkTokenEndpointUrl="${checkToeknUri}"
+	/>
+
+	<oauth:rest-template id="oauth2RestTemplate" resource="sparklr" />
+
+	<bean id="oauth2LogoutSuccessHandler" class="com.example.oidc.auth.OAuth2LogoutSuccessHandler"
+		p:logoutUri="${endSessionUri}"
+		p:defaultLogoutSuccessUri="/index.jsp"
+	/>
+	
+</beans>
