@@ -3,7 +3,7 @@ oidc1-on-secoauth2
 
 Extends Spring Security OAuth2 to suport OpenID Connect (OIDC) 1.0. tonr/sparklr samples from SECOAUTH2 to work with ODIC.
 
-This project is inspired by [MITREid Connect](https://github.com/mitreid-connect/) and [Nimbus OAuth 2.0 SDK w/ OpenID COnnect](http://connect2id.com/products/nimbus-oauth-openid-connect-sdk), borrowed a lot of idea from them.
+This project is inspired by [MITREid Connect](https://github.com/mitreid-connect/) and [Nimbus OAuth 2.0 SDK w/ OpenID Connect](http://connect2id.com/products/nimbus-oauth-openid-connect-sdk), borrowed a lot of idea from them.
 
 # Getting Started
 
@@ -12,17 +12,15 @@ This project is inspired by [MITREid Connect](https://github.com/mitreid-connect
 1. spring-* : 3.2.8.RELEASE
 1. spring-security : 3.2.3.RELEASE
 1. spring-security-oauth2 : 2.0.1.RELEASE
-1. spring-security-jwt : 1.0.2.RELEASE
-	
+
 ## Build samples applications (command line)
 
 "mvn package" in oidc1-on-secoauth2 directory will create three war files (tonr, sparklr, keyhole).
 
 ## Run in eclipse
 
-- Import tonr, sparklr, keyhole and oauth2sso projects with "Existing Maven projects" (Import -> Maven)
-- If necessary, import also "spring-security-oauth2" and "spring-security-jwt" from spring-security-oauth. (This should not be necessary, but eclipse will 
-complain about spring-security-oauth2-2.0.xsd file if they are not imported).
+- Import tonr, sparklr, keyhole and oidc-* projects with "Existing Maven projects" (Import -> Maven)
+- If necessary, change the "authServerUri" property in odic.properties.
 
 Now you can deploy all 3 apps (tonr2, sparklr2, keyhole2) into your Servers environment!
 
@@ -38,6 +36,13 @@ As of 2014-06-19
 - ID Token Validation (Section 3.1.3.7)
 - Signed/Encrypted JWT
 - UserInfo (/userinfo) endpoint and claims (Section 5)
+
+### Not Yet Supported:
+- Implict Flow (Section 3.2), Hybrid Flow (Section 3.3)
+- Initiating Login from Third parties (Section 4)
+- [OpenID Connect Discovery](http://openid.net/specs/openid-connect-discovery-1_0.html)
+- [OpenID Connect Dynamic Registration](http://openid.net/specs/openid-connect-registration-1_0.html)
+- [Session Management](http://openid.net/specs/openid-connect-session-1_0.html)
 
 ## Next step
 
