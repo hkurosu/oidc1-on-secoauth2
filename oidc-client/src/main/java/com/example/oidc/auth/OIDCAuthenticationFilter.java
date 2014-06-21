@@ -4,11 +4,13 @@
 package com.example.oidc.auth;
 
 import java.io.IOException;
+import java.text.ParseException;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
@@ -19,8 +21,9 @@ import org.springframework.security.oauth2.provider.authentication.OAuth2Authent
 import org.springframework.security.oauth2.provider.token.ResourceServerTokenServices;
 import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
 
-import com.example.oidc.token.ODIDCDefaultIdTokenValidator;
-import com.example.oidc.token.OIDCIdTokenValidator;
+import com.example.oidc.model.OIDCProviderMetadata;
+import com.nimbusds.jwt.PlainJWT;
+import com.nimbusds.jwt.ReadOnlyJWTClaimsSet;
 
 /**
  * @author hirobumi.kurosu
@@ -28,22 +31,15 @@ import com.example.oidc.token.OIDCIdTokenValidator;
  */
 public class OIDCAuthenticationFilter extends AbstractAuthenticationProcessingFilter {
 
-	protected OAuth2RestOperations restTemplate;
+	@Autowired
+	protected OIDCProviderMetadata providerMetadata;
 
-	protected OIDCIdTokenValidator idTokenValidator = new ODIDCDefaultIdTokenValidator();
+	protected OAuth2RestOperations restTemplate;
 
 	protected ResourceServerTokenServices tokenServices;
 
 	public void setTokenServices(ResourceServerTokenServices tokenServices) {
 		this.tokenServices = tokenServices;
-	}
-
-	public OIDCIdTokenValidator getIdTokenValidator() {
-		return idTokenValidator;
-	}
-
-	public void setIdTokenValidator(OIDCIdTokenValidator idTokenValidator) {
-		this.idTokenValidator = idTokenValidator;
 	}
 
 	public OAuth2RestOperations getRestTemplate() {
@@ -96,19 +92,35 @@ public class OIDCAuthenticationFilter extends AbstractAuthenticationProcessingFi
 	 * @see http://openid.net/specs/openid-connect-core-1_0.html#IDTokenValidation
 	 */
 	protected void validateIdToken(OAuth2AccessToken accessToken) throws AuthenticationException {
-		String idToken = retrieveIdToken(accessToken);
 		if (accessToken.getScope().contains("openid")) {
-			if (idToken == null) {
-				// TODO: throw an error
+			ReadOnlyJWTClaimsSet claims = parseIdToken(accessToken);
+
+			// ID validation rule from http://openid.net/specs/openid-connect-core-1_0.html#IDTokenValidation
+			// 2) check "iss" claim
+			if (claims.getIssuer() == null || !claims.getIssuer().equals(providerMetadata.getIssuer())) {
+				throw new InvalidTokenException("Mismatch ID Token's Issuer");
 			}
-			if (!idTokenValidator.validate(idToken)) {
-				// TODO: throw and error
+			// 3) check "aud" claim
+			String clientId = restTemplate.getResource().getClientId();
+			if (claims.getAudience() == null || !claims.getAudience().contains(clientId)) {
+				throw new InvalidTokenException("Mismatch ID Token's Issuer");
 			}
+
+			// TODO: DO remaining validations
+		}
+	}
+
+	protected ReadOnlyJWTClaimsSet parseIdToken(OAuth2AccessToken accessToken) throws InvalidTokenException {
+		try {
+			String idToken = retrieveIdToken(accessToken);
+			return PlainJWT.parse(idToken).getJWTClaimsSet();
+		}
+		catch (ParseException e) {
+			throw new InvalidTokenException("Cannot parse ID Token: ", e);
 		}
 	}
 
 	protected String retrieveIdToken(OAuth2AccessToken accessToken) {
 		return (String) accessToken.getAdditionalInformation().get("id_token");
 	}
-
 }

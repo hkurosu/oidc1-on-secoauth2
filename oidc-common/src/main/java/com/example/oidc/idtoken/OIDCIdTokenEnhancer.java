@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.example.oidc.token;
+package com.example.oidc.idtoken;
 
 import java.util.Arrays;
 import java.util.Date;
