@@ -11,6 +11,7 @@ import org.springframework.security.oauth2.common.OAuth2AccessToken;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.security.oauth2.provider.token.TokenEnhancer;
 
+import com.example.oidc.model.OIDCProviderMetadata;
 import com.nimbusds.jwt.JWT;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.PlainJWT;
@@ -21,21 +22,18 @@ import com.nimbusds.jwt.PlainJWT;
  */
 public class OIDCIdTokenEnhancer implements TokenEnhancer {
 
-	private String issuer;
+	private OIDCProviderMetadata providerMetadata;
 
-	public String getIssuer() {
-		return issuer;
-	}
 
-	public void setIssuer(String issuer) {
-		this.issuer = issuer;
+	public void setProviderMetadata(OIDCProviderMetadata providerMetadata) {
+		this.providerMetadata = providerMetadata;
 	}
 
 	@Override
 	public OAuth2AccessToken enhance(OAuth2AccessToken accessToken, OAuth2Authentication authentication) {
 		if (authentication.getOAuth2Request().getScope().contains("openid")) {
 			JWTClaimsSet idClaims = new JWTClaimsSet();
-			idClaims.setIssuer(issuer);
+			idClaims.setIssuer(providerMetadata.getIssuer());
 			idClaims.setSubject(authentication.getName());
 			idClaims.setAudience(Arrays.asList(authentication.getOAuth2Request().getClientId()));
 			idClaims.setExpirationTime(accessToken.getExpiration());

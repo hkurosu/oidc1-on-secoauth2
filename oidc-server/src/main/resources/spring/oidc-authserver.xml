@@ -29,8 +29,8 @@
 		<property name="clientDetailsService" ref="clientDetails" />
 	</bean>
 
-	<bean id="tokenEnhancer" class="com.example.oidc.token.OIDCIdTokenEnhancer"
-		p:issuer="${authServerUri}"
+	<bean id="tokenEnhancer" class="com.example.oidc.idtoken.OIDCIdTokenEnhancer"
+		p:providerMetadata-ref="oidcProviderMetadata"
 	/>
 
 	<bean id="requestFactory"

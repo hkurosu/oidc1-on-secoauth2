@@ -19,10 +19,12 @@
 		<sec:expression-handler ref="oauthExpressionHandler" />
 	</sec:global-method-security>
 
+	<context:property-placeholder location="classpath:/oidc.properties" />
+
 	<import resource="classpath:spring/spring-views.xml"/>
 
-
 	<!-- client details definitions -->
+	<import resource="classpath:/spring/oidc-common.xml"/>
 	<import resource="classpath:/spring/oauth2-clients.xml"/>
 	<import resource="classpath:/spring/oidc-authserver.xml"/>
 	<import resource="classpath:/spring/oidc-endpoints.xml"/>

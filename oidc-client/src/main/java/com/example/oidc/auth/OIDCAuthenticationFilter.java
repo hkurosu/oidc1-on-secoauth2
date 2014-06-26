@@ -10,7 +10,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
@@ -31,7 +30,6 @@ import com.nimbusds.jwt.ReadOnlyJWTClaimsSet;
  */
 public class OIDCAuthenticationFilter extends AbstractAuthenticationProcessingFilter {
 
-	@Autowired
 	protected OIDCProviderMetadata providerMetadata;
 
 	protected OAuth2RestOperations restTemplate;
@@ -53,6 +51,10 @@ public class OIDCAuthenticationFilter extends AbstractAuthenticationProcessingFi
 	 */
 	public void setRestTemplate(OAuth2RestOperations restTemplate) {
 		this.restTemplate = restTemplate;
+	}
+
+	public void setProviderMetadata(OIDCProviderMetadata providerMetadata) {
+		this.providerMetadata = providerMetadata;
 	}
 
 	protected OIDCAuthenticationFilter(String defaultFilterProcessesUrl) {

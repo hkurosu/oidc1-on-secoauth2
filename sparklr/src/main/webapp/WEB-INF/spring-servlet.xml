@@ -24,7 +24,8 @@
 	<import resource="classpath:spring/spring-views.xml" />
 
 	<!-- resource server definitions -->
-	<import resource="classpath:/spring/oauth2-resources.xml" />
+	<import resource="classpath:spring/oidc-common.xml"/>
+	<import resource="classpath:spring/oauth2-resources.xml" />
 	<import resource="classpath:spring/oidc-client-filter.xml" />
 
 	<oauth:expression-handler id="oauthExpressionHandler" />

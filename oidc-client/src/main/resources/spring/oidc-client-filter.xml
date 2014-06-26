@@ -23,7 +23,9 @@
 	<bean id="oidcSignOnFilter"	class="com.example.oidc.auth.OIDCAuthenticationFilter"
 		c:defaultFilterProcessesUrl="${loginFormUri}"		
 		p:tokenServices-ref="oauth2RemoteTokenServices"
-		p:restTemplate-ref="oauth2RestTemplate" />
+		p:restTemplate-ref="oauth2RestTemplate" 
+		p:providerMetadata-ref="oidcProviderMetadata"
+		/>
 
 	<bean id="oauth2RemoteTokenServices" class="org.springframework.security.oauth2.provider.token.RemoteTokenServices"
 		p:clientId="tonr"
