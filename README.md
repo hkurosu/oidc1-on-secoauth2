@@ -26,8 +26,12 @@ Now you can deploy all 3 apps (tonr2, sparklr2, keyhole2) into your Servers envi
 
 ## OIDC features
 
-As of 2014-06-19
 ### Supported:
+(2014-06-26)
+- ID token validation (partially) [3.1.3.7.  ID Token Validation](http://openid.net/specs/openid-connect-core-1_0.html#IDTokenValidation)
+- (partially) [7.  Self-Issued OpenID Provider](http://openid.net/specs/openid-connect-core-1_0.html#SelfIssued)
+
+(2014-06-19)
 - Authorization Code Flow in [Section 3.1.1 to 3.1.3.6](http://openid.net/specs/openid-connect-core-1_0.html#CodeFlowAuth) in OpenID Connect Core 1.0.
 - Plain JWT format for ID Token (Uses [Nimbus JOSE JWT](https://bitbucket.org/connect2id/nimbus-jose-jwt/wiki/Home))
  
